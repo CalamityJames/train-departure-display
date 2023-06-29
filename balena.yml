@@ -69,5 +69,6 @@ data:
     - screen1Platform:
     - screen2Platform:
     - individualStationDepartureTime: False
+    - showDepartureNumbers: False
 version: 0.4.0
 
