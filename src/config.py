@@ -7,9 +7,13 @@ def loadConfig():
         "api": {}
     }
 
-    data["refreshTime"] = int(os.getenv("refreshTime") or 30)
+    data["refreshTime"] = int(os.getenv("refreshTime") or 180)
+    data["fpsTime"] = int(os.getenv("fpsTime") or 2)
     data["screenRotation"] = int(os.getenv("screenRotation") or 2)
     data["screenBlankHours"] = os.getenv("screenBlankHours") or ""
+    data["headless"] = False
+    if os.getenv("headless") == "True":
+        data["headless"] = True   
     data["emulator"] = False
     if os.getenv("emulator") == "True":
         data["emulator"] = True    
@@ -31,13 +35,13 @@ def loadConfig():
     data["journey"]["outOfHoursName"] = os.getenv("outOfHoursName") or "London Paddington"
     data["journey"]["stationAbbr"] = { "International": "Intl." }
     data["journey"]['timeOffset'] = os.getenv("timeOffset") or "0"
-    data["journey"]["screen1Platform"] = os.getenv("screen1Platform")
-    data["journey"]["screen2Platform"] = os.getenv("screen2Platform")
+    data["journey"]["screen1Platform"] = os.getenv("screen1Platform") or ""
+    data["journey"]["screen2Platform"] = os.getenv("screen2Platform") or ""
 
-    if data["journey"]["screen1Platform"] and data["journey"]["screen1Platform"].isnumeric() != True:
+    if data["journey"]["screen1Platform"].isnumeric() != True:
         data["journey"]["screen1Platform"] = ""
 
-    if data["journey"]["screen2Platform"] and data["journey"]["screen2Platform"].isnumeric() != True:
+    if data["journey"]["screen2Platform"].isnumeric() != True:
         data["journey"]["screen2Platform"] = ""
 
     data["api"]["apiKey"] = os.getenv("apiKey") or None

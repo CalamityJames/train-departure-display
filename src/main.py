@@ -81,7 +81,7 @@ def renderCallingAt(draw, width, height):
 pixelsLeft = 1
 pixelsUp = 0
 hasElevated = 0
-renderDictionary = dict()
+stationRenderCache = dict()
 
 def renderStations(stations):
     def drawText(draw, width, height):
@@ -90,22 +90,25 @@ def renderStations(stations):
         if(len(stations) == stationRenderCount - 5):
             stationRenderCount = 0
 
-        if stations in renderDictionary:
-            pre = renderDictionary[stations]
+        # cache the bitmap representation of the stations string
+        if stations in stationRenderCache:
+            # found in cache; re-use it
+            pre = stationRenderCache[stations]
             bitmap = pre['bitmap']
             txt_width = pre['txt_width']
             txt_height = pre['txt_height']
         else:
+            # not cached; create a new image containing the string as a monochrome bitmap
             _, _, txt_width, txt_height = font.getbbox(stations)
             bitmap = Image.new('L', [txt_width, txt_height], color=0)
             pre_render_draw = ImageDraw.Draw(bitmap)
             pre_render_draw.text((0, 0), text=stations, width=width, font=font, fill=255)
-            renderDictionary[stations] = {'bitmap': bitmap, 'txt_width': txt_width, 'txt_height': txt_height}
+            # save to render cache
+            stationRenderCache[stations] = {'bitmap': bitmap, 'txt_width': txt_width, 'txt_height': txt_height}
 
         if hasElevated:
-            # draw pixel position left
+            # slide the bitmap left until it's fully out of view
             draw.bitmap((pixelsLeft - 1,0), bitmap, fill="yellow")
-            # continue left until morale improves
             if -pixelsLeft > txt_width and pauseCount < 8:
                 pauseCount += 1
                 pixelsLeft = 0
@@ -114,9 +117,8 @@ def renderStations(stations):
                 pauseCount = 0
                 pixelsLeft = pixelsLeft - 1
         else:
-            # draw it up from the bottom
+            # slide the bitmap up from the bottom of its viewport until it's fully in view
             draw.bitmap((0, txt_height - pixelsUp), bitmap, fill="yellow")
-            # continue up until morale improves
             if pixelsUp == txt_height:
                 pauseCount += 1
                 if pauseCount > 20:
@@ -125,10 +127,6 @@ def renderStations(stations):
             else:
                 pixelsUp = pixelsUp + 1
             
-        # draw.text((pixelsLeft, 0), text=stations, width=width, font=font, fill="yellow")
-
-
-
     return drawText
 
 def renderTime(draw, width, height):
@@ -250,6 +248,8 @@ def drawBlankSignage(device, width, height, departureStation):
     rowTwo = snapshot(width, 10, renderDepartureStation(
         departureStation, (width - stationSize) / 2), interval=config["refreshTime"])
     rowThree = snapshot(width, 10, renderDots, interval=config["refreshTime"])
+    # this will skip a second sometimes if set to 1, but a hotspot burns CPU
+    # so set to snapshot of 0.1; you won't notice
     rowTime = snapshot(width, 14, renderTime, interval=0.1)
 
     if len(virtualViewport._hotspots) > 0:
@@ -363,9 +363,14 @@ try:
     print('Starting Train Departure Display v' + version_file.read())
     config = loadConfig()
     if config['emulator'] == True:
+        print('Emulating using pygame; frames will be locked to 60fps')
         device = pygame(256, 64)
     else:
-        serial = spi(port=0)
+        if config['headless'] == True:
+            print('Headless mode, running main loop without serial comms')
+            serial = noop()
+        else:
+            serial = spi(port=0)
         device = ssd1322(serial, mode="1", rotate=config['screenRotation'])
 
     if config['dualScreen'] == True:
@@ -392,7 +397,8 @@ try:
     if config['dualScreen'] == True:
         virtual = drawStartup(device1, width=widgetWidth, height=widgetHeight)
         virtual.refresh()
-    time.sleep(0.1)
+    if config['emulator'] != True and config['headless'] != True:
+        time.sleep(5)
 
     timeAtStart = time.time()-config["refreshTime"]
     timeNow = time.time()
@@ -410,9 +416,8 @@ try:
                     device1.clear()
                 time.sleep(10)
             else:
-                if(timeNow - timeFPS >= 2):
+                if(timeNow - timeFPS >= config['fpsTime']):
                     timeFPS = time.time()
-                    # print(chr(27) + "[2J")
                     print('Effective FPS: ' + str(round(regulator.effective_FPS(),2)))
                 if(timeNow - timeAtStart >= config["refreshTime"]):
                     data = loadData(config["api"], config["journey"], config)
