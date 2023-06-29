@@ -37,7 +37,6 @@ def renderDestination(departure, font, pos):
             train = f"{pos}  {departureTime}  {destinationName}"
         else:
             train = f"{departureTime}  {destinationName}"
-        print('draw.text at renderDestination')
         draw.text((0, 0), text=train, font=font, fill="yellow")
 
     return drawText
@@ -61,7 +60,6 @@ def renderServiceStatus(departure):
                 train = "On time"
 
         w = int(font.getlength(train))
-        print('draw.text at renderServiceStatus')
         draw.text((width-w,0), text=train, font=font, fill="yellow")
     return drawText
 
@@ -69,7 +67,6 @@ def renderServiceStatus(departure):
 def renderPlatform(departure):
     def drawText(draw, width, height):
         if "platform" in departure:
-            print('draw.text at renderPlatform')
             if (departure["platform"].lower() == "bus"):
                 draw.text((0, 0), text="BUS", font=font, fill="yellow")
             else:
@@ -79,7 +76,6 @@ def renderPlatform(departure):
 
 def renderCallingAt(draw, width, height):
     stations = "Calling at: "
-    print('draw.text at renderCallingAt')
     draw.text((0, 0), text=stations, font=font, fill="yellow")
 
 
@@ -158,7 +154,6 @@ def renderTime(draw, width, height):
 def renderWelcomeTo(xOffset):
     def drawText(draw, width, height):
         text = "Welcome to"
-        print('draw.text at renderWelcomeTo')
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return drawText
@@ -166,7 +161,6 @@ def renderWelcomeTo(xOffset):
 def renderPoweredBy(xOffset):
     def drawText(draw, width, height):
         text = "Powered by"
-        print('draw.text at renderPoweredBy')
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return drawText
@@ -174,7 +168,6 @@ def renderPoweredBy(xOffset):
 def renderNRE(xOffset):
     def drawText(draw, width, height):
         text = "National Rail Enquiries"
-        print('draw.text at renderNRE')
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return drawText
@@ -182,7 +175,6 @@ def renderNRE(xOffset):
 def renderName(xOffset):
     def drawText(draw, width, height):
         text = "UK Train Departure Display"
-        print('draw.text at renderName')
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return drawText
@@ -190,7 +182,6 @@ def renderName(xOffset):
 def renderDepartureStation(departureStation, xOffset):
     def draw(draw, width, height):
         text = departureStation
-        print('draw.text at renderDepartureStation')
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return draw
@@ -198,7 +189,6 @@ def renderDepartureStation(departureStation, xOffset):
 
 def renderDots(draw, width, height):
     text = ".  .  ."
-    print('draw.text at renderDots')
     draw.text((0, 0), text=text, font=fontBold, fill="yellow")
 
 
