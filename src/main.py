@@ -37,7 +37,8 @@ def renderDestination(departure, font, pos):
             train = f"{pos}  {departureTime}  {destinationName}"
         else:
             train = f"{departureTime}  {destinationName}"
-        draw.text((0, 0), text=train, font=font, fill="yellow")
+        w, _, bitmap = cachedBitmapText(train, font)
+        draw.bitmap((0,0), bitmap, fill="yellow")
 
     return drawText
 
@@ -59,24 +60,26 @@ def renderServiceStatus(departure):
             if departure["aimed_departure_time"] == departure["expected_departure_time"]:
                 train = "On time"
 
-        w = int(font.getlength(train))
-        draw.text((width-w,0), text=train, font=font, fill="yellow")
+        w, _, bitmap = cachedBitmapText(train, font)
+        draw.bitmap((width-w,0), bitmap, fill="yellow")
     return drawText
 
 
 def renderPlatform(departure):
     def drawText(draw, width, height):
         if "platform" in departure:
+            platform = "Plat "+departure["platform"]
             if (departure["platform"].lower() == "bus"):
-                draw.text((0, 0), text="BUS", font=font, fill="yellow")
-            else:
-                draw.text((0, 0), text="Plat "+departure["platform"], font=font, fill="yellow")
+                platform="BUS"
+            _, _, bitmap = cachedBitmapText(platform, font)
+            draw.bitmap((0, 0), bitmap, fill="yellow")
     return drawText
 
 
 def renderCallingAt(draw, width, height):
     stations = "Calling at: "
-    draw.text((0, 0), text=stations, font=font, fill="yellow")
+    _, _, bitmap = cachedBitmapText(stations, font)
+    draw.bitmap((0, 0), bitmap, fill="yellow")
 
 
 bitmapRenderCache = dict()
