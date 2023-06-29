@@ -9,11 +9,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 * New feature: `showDepartureNumbers` option - Adds 1st / 2nd / 3rd prefix as per UK train departures
 * New feature: `firstDepartureBold` option - toggle bold of first departure line as this is regional
+* New feature: `targetFPS` option - configurable FPS regulator (zero to disable)
+* Development UX: `emulator` option - Emulator mode via pygame
+* Development UX: `headless` option - Run using emulated serial port (Useful for optimisation checks)
+* Development UX: Skip NRE attribution sleep in any dev mode (headless/emulator)
 * Performance: Seconds now render every 0.1 second, rather than a hotspot (reduce CPU)
 * Performance: All "in-loop" TTF font rendering is now cached (reduce CPU)
-* Development UX: `emulator` option - Emulator mode via pygame
-* Development UX: Skip NRE attribution sleep in any dev mode (headless/emulator)
-* Development UX: `headless` option - Run using emulated serial port (Useful for optimisation checks)
 * Fix: screen1Platform/screen2Platform being required incorrectly on the env
 
 # v0.4.0
