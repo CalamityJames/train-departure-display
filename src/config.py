@@ -1,6 +1,7 @@
 import os
 import re
 
+
 def loadConfig():
     data = {
         "journey": {},
@@ -14,10 +15,10 @@ def loadConfig():
     data["screenBlankHours"] = os.getenv("screenBlankHours") or ""
     data["headless"] = False
     if os.getenv("headless") == "True":
-        data["headless"] = True   
+        data["headless"] = True
     data["emulator"] = False
     if os.getenv("emulator") == "True":
-        data["emulator"] = True    
+        data["emulator"] = True
     data["dualScreen"] = False
     if os.getenv("dualScreen") == "True":
         data["dualScreen"] = True
@@ -37,15 +38,15 @@ def loadConfig():
         data["journey"]["individualStationDepartureTime"] = True
 
     data["journey"]["outOfHoursName"] = os.getenv("outOfHoursName") or "London Paddington"
-    data["journey"]["stationAbbr"] = { "International": "Intl." }
+    data["journey"]["stationAbbr"] = {"International": "Intl."}
     data["journey"]['timeOffset'] = os.getenv("timeOffset") or "0"
     data["journey"]["screen1Platform"] = os.getenv("screen1Platform") or ""
     data["journey"]["screen2Platform"] = os.getenv("screen2Platform") or ""
 
-    if data["journey"]["screen1Platform"].isnumeric() != True:
+    if data["journey"]["screen1Platform"].isnumeric() is not True:
         data["journey"]["screen1Platform"] = ""
 
-    if data["journey"]["screen2Platform"].isnumeric() != True:
+    if data["journey"]["screen2Platform"].isnumeric() is not True:
         data["journey"]["screen2Platform"] = ""
 
     data["api"]["apiKey"] = os.getenv("apiKey") or None
@@ -56,4 +57,3 @@ def loadConfig():
         data["showDepartureNumbers"] = True
 
     return data
-    
