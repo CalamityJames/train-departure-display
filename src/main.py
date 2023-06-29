@@ -37,6 +37,7 @@ def renderDestination(departure, font, pos):
             train = f"{pos}  {departureTime}  {destinationName}"
         else:
             train = f"{departureTime}  {destinationName}"
+        print('draw.text at renderDestination')
         draw.text((0, 0), text=train, font=font, fill="yellow")
 
     return drawText
@@ -60,6 +61,7 @@ def renderServiceStatus(departure):
                 train = "On time"
 
         w = int(font.getlength(train))
+        print('draw.text at renderServiceStatus')
         draw.text((width-w,0), text=train, font=font, fill="yellow")
     return drawText
 
@@ -67,6 +69,7 @@ def renderServiceStatus(departure):
 def renderPlatform(departure):
     def drawText(draw, width, height):
         if "platform" in departure:
+            print('draw.text at renderPlatform')
             if (departure["platform"].lower() == "bus"):
                 draw.text((0, 0), text="BUS", font=font, fill="yellow")
             else:
@@ -76,12 +79,37 @@ def renderPlatform(departure):
 
 def renderCallingAt(draw, width, height):
     stations = "Calling at: "
+    print('draw.text at renderCallingAt')
     draw.text((0, 0), text=stations, font=font, fill="yellow")
+
+
+bitmapRenderCache = dict()
+def cachedBitmapText(text, font):
+    # cache the bitmap representation of the stations string
+    nameTuple = font.getname()
+    fontKey = ''
+    for item in nameTuple:
+        fontKey = fontKey + item
+    key = text + fontKey
+    if key in bitmapRenderCache:
+        # found in cache; re-use it
+        pre = bitmapRenderCache[key]
+        bitmap = pre['bitmap']
+        txt_width = pre['txt_width']
+        txt_height = pre['txt_height']
+    else:
+        # not cached; create a new image containing the string as a monochrome bitmap
+        _, _, txt_width, txt_height = font.getbbox(text)
+        bitmap = Image.new('L', [txt_width, txt_height], color=0)
+        pre_render_draw = ImageDraw.Draw(bitmap)
+        pre_render_draw.text((0, 0), text=text, font=font, fill=255)
+        # save to render cache
+        bitmapRenderCache[key] = {'bitmap': bitmap, 'txt_width': txt_width, 'txt_height': txt_height}
+    return txt_width, txt_height, bitmap
 
 pixelsLeft = 1
 pixelsUp = 0
 hasElevated = 0
-stationRenderCache = dict()
 
 def renderStations(stations):
     def drawText(draw, width, height):
@@ -90,21 +118,7 @@ def renderStations(stations):
         if(len(stations) == stationRenderCount - 5):
             stationRenderCount = 0
 
-        # cache the bitmap representation of the stations string
-        if stations in stationRenderCache:
-            # found in cache; re-use it
-            pre = stationRenderCache[stations]
-            bitmap = pre['bitmap']
-            txt_width = pre['txt_width']
-            txt_height = pre['txt_height']
-        else:
-            # not cached; create a new image containing the string as a monochrome bitmap
-            _, _, txt_width, txt_height = font.getbbox(stations)
-            bitmap = Image.new('L', [txt_width, txt_height], color=0)
-            pre_render_draw = ImageDraw.Draw(bitmap)
-            pre_render_draw.text((0, 0), text=stations, width=width, font=font, fill=255)
-            # save to render cache
-            stationRenderCache[stations] = {'bitmap': bitmap, 'txt_width': txt_width, 'txt_height': txt_height}
+        txt_width, txt_height, bitmap = cachedBitmapText(stations, font)
 
         if hasElevated:
             # slide the bitmap left until it's fully out of view
@@ -133,18 +147,18 @@ def renderTime(draw, width, height):
     rawTime = datetime.now().time()
     hour, minute, second = str(rawTime).split('.')[0].split(':')
 
-    w1 = int(fontBoldLarge.getlength("{}:{}".format(hour, minute)))
-    w2 = int(fontBoldTall.getlength(":00"))
+    w1, _, HMBitmap = cachedBitmapText("{}:{}".format(hour, minute), fontBoldLarge)
+    w2, _, _ = cachedBitmapText(':00', fontBoldTall)
+    _, _, SBitmap = cachedBitmapText(':{}'.format(second), fontBoldTall)
 
-    draw.text(((width - w1 - w2) / 2, 0), text="{}:{}".format(hour, minute),
-              font=fontBoldLarge, fill="yellow")
-    draw.text((((width - w1 - w2) / 2) + w1, 5), text=":{}".format(second),
-              font=fontBoldTall, fill="yellow")
+    draw.bitmap(((width - w1 - w2) / 2, 0), HMBitmap, fill="yellow")
+    draw.bitmap((((width - w1 - w2) / 2) + w1, 5), SBitmap, fill="yellow")
 
 
 def renderWelcomeTo(xOffset):
     def drawText(draw, width, height):
         text = "Welcome to"
+        print('draw.text at renderWelcomeTo')
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return drawText
@@ -152,6 +166,7 @@ def renderWelcomeTo(xOffset):
 def renderPoweredBy(xOffset):
     def drawText(draw, width, height):
         text = "Powered by"
+        print('draw.text at renderPoweredBy')
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return drawText
@@ -159,6 +174,7 @@ def renderPoweredBy(xOffset):
 def renderNRE(xOffset):
     def drawText(draw, width, height):
         text = "National Rail Enquiries"
+        print('draw.text at renderNRE')
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return drawText
@@ -166,6 +182,7 @@ def renderNRE(xOffset):
 def renderName(xOffset):
     def drawText(draw, width, height):
         text = "UK Train Departure Display"
+        print('draw.text at renderName')
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return drawText
@@ -173,6 +190,7 @@ def renderName(xOffset):
 def renderDepartureStation(departureStation, xOffset):
     def draw(draw, width, height):
         text = departureStation
+        print('draw.text at renderDepartureStation')
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return draw
@@ -180,6 +198,7 @@ def renderDepartureStation(departureStation, xOffset):
 
 def renderDots(draw, width, height):
     text = ".  .  ."
+    print('draw.text at renderDots')
     draw.text((0, 0), text=text, font=fontBold, fill="yellow")
 
 
