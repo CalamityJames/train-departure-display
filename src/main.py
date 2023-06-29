@@ -417,7 +417,7 @@ try:
     pauseCount = 0
     loop_count = 0
 
-    regulator = framerate_regulator(0)
+    regulator = framerate_regulator(config['targetFPS'])
 
     # display NRE attribution while data loads
     virtual = drawStartup(device, width=widgetWidth, height=widgetHeight)

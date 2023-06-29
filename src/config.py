@@ -7,6 +7,7 @@ def loadConfig():
         "api": {}
     }
 
+    data["targetFPS"] = int(os.getenv("targetFPS") or 70)
     data["refreshTime"] = int(os.getenv("refreshTime") or 180)
     data["fpsTime"] = int(os.getenv("fpsTime") or 180)
     data["screenRotation"] = int(os.getenv("screenRotation") or 2)
