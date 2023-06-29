@@ -13,7 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Performance: All "in-loop" TTF font rendering is now cached (reduce CPU)
 * Development UX: `emulator` option - Emulator mode via pygame
 * Development UX: Skip NRE attribution sleep in any dev mode (headless/emulator)
-* Development UX: `headless` option - Headless mode via serial noop
+* Development UX: `headless` option - Run using emulated serial port (Useful for optimisation checks)
 * Fix: screen1Platform/screen2Platform being required incorrectly on the env
 
 # v0.4.0
