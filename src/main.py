@@ -363,7 +363,6 @@ try:
     print('Starting Train Departure Display v' + version_file.read())
     config = loadConfig()
     if config['emulator'] == True:
-        serial = noop()
         device = pygame(256, 64)
     else:
         serial = spi(port=0)

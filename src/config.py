@@ -34,10 +34,10 @@ def loadConfig():
     data["journey"]["screen1Platform"] = os.getenv("screen1Platform")
     data["journey"]["screen2Platform"] = os.getenv("screen2Platform")
 
-    if data["journey"]["screen1Platform"].isnumeric() != True:
+    if data["journey"]["screen1Platform"] and data["journey"]["screen1Platform"].isnumeric() != True:
         data["journey"]["screen1Platform"] = ""
 
-    if data["journey"]["screen2Platform"].isnumeric() != True:
+    if data["journey"]["screen2Platform"] and data["journey"]["screen2Platform"].isnumeric() != True:
         data["journey"]["screen2Platform"] = ""
 
     data["api"]["apiKey"] = os.getenv("apiKey") or None
