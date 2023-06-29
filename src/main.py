@@ -14,8 +14,9 @@ from luma.core.interface.serial import spi, noop
 from luma.core.render import canvas
 from luma.oled.device import ssd1322
 from luma.emulator.device import pygame
-from luma.core.virtual import viewport, snapshot, hotspot
+from luma.core.virtual import viewport, snapshot
 from luma.core.sprite_system import framerate_regulator
+
 
 def makeFont(name, size):
     font_path = os.path.abspath(
@@ -33,12 +34,12 @@ def renderDestination(departure, font, pos):
     destinationName = departure["destination_name"]
 
     def drawText(draw, width, height):
-        if config["showDepartureNumbers"] == True:
+        if config["showDepartureNumbers"]:
             train = f"{pos}  {departureTime}  {destinationName}"
         else:
             train = f"{departureTime}  {destinationName}"
         w, _, bitmap = cachedBitmapText(train, font)
-        draw.bitmap((0,0), bitmap, fill="yellow")
+        draw.bitmap((0, 0), bitmap, fill="yellow")
 
     return drawText
 
@@ -55,22 +56,22 @@ def renderServiceStatus(departure):
             train = "Delayed"
         else:
             if isinstance(departure["expected_departure_time"], str):
-                train = 'Exp '+departure["expected_departure_time"]
+                train = 'Exp ' + departure["expected_departure_time"]
 
             if departure["aimed_departure_time"] == departure["expected_departure_time"]:
                 train = "On time"
 
         w, _, bitmap = cachedBitmapText(train, font)
-        draw.bitmap((width-w,0), bitmap, fill="yellow")
+        draw.bitmap((width - w, 0), bitmap, fill="yellow")
     return drawText
 
 
 def renderPlatform(departure):
     def drawText(draw, width, height):
         if "platform" in departure:
-            platform = "Plat "+departure["platform"]
+            platform = "Plat " + departure["platform"]
             if (departure["platform"].lower() == "bus"):
-                platform="BUS"
+                platform = "BUS"
             _, _, bitmap = cachedBitmapText(platform, font)
             draw.bitmap((0, 0), bitmap, fill="yellow")
     return drawText
@@ -83,6 +84,8 @@ def renderCallingAt(draw, width, height):
 
 
 bitmapRenderCache = dict()
+
+
 def cachedBitmapText(text, font):
     # cache the bitmap representation of the stations string
     nameTuple = font.getname()
@@ -106,22 +109,24 @@ def cachedBitmapText(text, font):
         bitmapRenderCache[key] = {'bitmap': bitmap, 'txt_width': txt_width, 'txt_height': txt_height}
     return txt_width, txt_height, bitmap
 
+
 pixelsLeft = 1
 pixelsUp = 0
 hasElevated = 0
+
 
 def renderStations(stations):
     def drawText(draw, width, height):
         global stationRenderCount, pauseCount, pixelsLeft, pixelsUp, hasElevated
 
-        if(len(stations) == stationRenderCount - 5):
+        if (len(stations) == stationRenderCount - 5):
             stationRenderCount = 0
 
         txt_width, txt_height, bitmap = cachedBitmapText(stations, font)
 
         if hasElevated:
             # slide the bitmap left until it's fully out of view
-            draw.bitmap((pixelsLeft - 1,0), bitmap, fill="yellow")
+            draw.bitmap((pixelsLeft - 1, 0), bitmap, fill="yellow")
             if -pixelsLeft > txt_width and pauseCount < 8:
                 pauseCount += 1
                 pixelsLeft = 0
@@ -139,8 +144,9 @@ def renderStations(stations):
                     pixelsUp = 0
             else:
                 pixelsUp = pixelsUp + 1
-            
+
     return drawText
+
 
 def renderTime(draw, width, height):
     rawTime = datetime.now().time()
@@ -161,12 +167,14 @@ def renderWelcomeTo(xOffset):
 
     return drawText
 
+
 def renderPoweredBy(xOffset):
     def drawText(draw, width, height):
         text = "Powered by"
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return drawText
+
 
 def renderNRE(xOffset):
     def drawText(draw, width, height):
@@ -175,12 +183,14 @@ def renderNRE(xOffset):
 
     return drawText
 
+
 def renderName(xOffset):
     def drawText(draw, width, height):
         text = "UK Train Departure Display"
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return drawText
+
 
 def renderDepartureStation(departureStation, xOffset):
     def draw(draw, width, height):
@@ -200,19 +210,19 @@ def loadData(apiConfig, journeyConfig, config):
     if config['hoursPattern'].match(apiConfig['operatingHours']):
         runHours = [int(x) for x in apiConfig['operatingHours'].split('-')]
 
-    if len(runHours) == 2 and isRun(runHours[0], runHours[1]) == False:
+    if len(runHours) == 2 and isRun(runHours[0], runHours[1]) is False:
         return False, False, journeyConfig['outOfHoursName']
 
-    if config['dualScreen'] == True:
+    if config['dualScreen']:
         rows = "6"
     else:
         rows = "3"
 
-    try: 
+    try:
         departures, stationName = loadDeparturesForStation(
             journeyConfig, apiConfig["apiKey"], rows)
 
-        if (departures == None):
+        if (departures is None):
             return False, False, stationName
 
         firstDepartureDestinations = departures[0]["calling_at_list"]
@@ -226,7 +236,7 @@ def loadData(apiConfig, journeyConfig, config):
 def drawStartup(device, width, height):
     virtualViewport = viewport(device, width=width, height=height)
 
-    with canvas(device) as draw:
+    with canvas(device):
         nameSize = int(fontBold.getlength("UK Train Departure Display"))
         poweredSize = int(fontBold.getlength("Powered by"))
         NRESize = int(fontBold.getlength("National Rail Enquiries"))
@@ -244,6 +254,7 @@ def drawStartup(device, width, height):
         virtualViewport.add_hotspot(rowFour, (0, 36))
 
     return virtualViewport
+
 
 def drawBlankSignage(device, width, height, departureStation):
     global stationRenderCount, pauseCount
@@ -275,6 +286,7 @@ def drawBlankSignage(device, width, height, departureStation):
 
     return virtualViewport
 
+
 def platform_filter(departureData, platformNumber, nextStations, station):
     platformDepartures = []
     for sub in departureData:
@@ -292,6 +304,7 @@ def platform_filter(departureData, platformNumber, nextStations, station):
         platformData = platformDepartures, "", station
 
     return platformData
+
 
 def drawSignage(device, width, height, data):
     global stationRenderCount, pauseCount
@@ -312,12 +325,12 @@ def drawSignage(device, width, height, data):
     w = int(font.getlength(status))
     pw = int(font.getlength("Plat 88"))
 
-    if(len(departures) == 0):
+    if (len(departures) == 0):
         noTrains = drawBlankSignage(device, width=width, height=height, departureStation=departureStation)
         return noTrains
 
     firstFont = font
-    if config['firstDepartureBold'] == True:
+    if config['firstDepartureBold']:
         firstFont = fontBold
 
     rowOneA = snapshot(
@@ -329,14 +342,14 @@ def drawSignage(device, width, height, data):
     rowTwoB = snapshot(width - callingWidth, 10,
                        renderStations(firstDepartureDestinations), interval=0.02)
 
-    if(len(departures) > 1):
+    if (len(departures) > 1):
         rowThreeA = snapshot(width - w - pw, 10, renderDestination(
             departures[1], font, '2nd'), interval=config["refreshTime"])
         rowThreeB = snapshot(w, 10, renderServiceStatus(
             departures[1]), interval=config["refreshTime"])
         rowThreeC = snapshot(pw, 10, renderPlatform(departures[1]), interval=config["refreshTime"])
 
-    if(len(departures) > 2):
+    if (len(departures) > 2):
         rowFourA = snapshot(width - w - pw, 10, renderDestination(
             departures[2], font, '3rd'), interval=10)
         rowFourB = snapshot(w, 10, renderServiceStatus(
@@ -358,12 +371,12 @@ def drawSignage(device, width, height, data):
     virtualViewport.add_hotspot(rowTwoA, (0, 12))
     virtualViewport.add_hotspot(rowTwoB, (callingWidth, 12))
 
-    if(len(departures) > 1):
+    if (len(departures) > 1):
         virtualViewport.add_hotspot(rowThreeA, (0, 24))
         virtualViewport.add_hotspot(rowThreeB, (width - w, 24))
         virtualViewport.add_hotspot(rowThreeC, (width - w - pw, 24))
 
-    if(len(departures) > 2):
+    if (len(departures) > 2):
         virtualViewport.add_hotspot(rowFourA, (0, 36))
         virtualViewport.add_hotspot(rowFourB, (width - w, 36))
         virtualViewport.add_hotspot(rowFourC, (width - w - pw, 36))
@@ -378,19 +391,19 @@ try:
 
     print('Starting Train Departure Display v' + version_file.read())
     config = loadConfig()
-    if config['emulator'] == True:
+    if config['emulator']:
         print('Emulating using pygame; frames will be locked to 60fps')
         device = pygame(256, 64)
     else:
-        if config['headless'] == True:
+        if config['headless']:
             print('Headless mode, running main loop without serial comms')
             serial = noop()
         else:
             serial = spi(port=0)
         device = ssd1322(serial, mode="1", rotate=config['screenRotation'])
 
-    if config['dualScreen'] == True:
-        serial1 = spi(port=1,gpio_DC=5, gpio_RST=6)
+    if config['dualScreen']:
+        serial1 = spi(port=1, gpio_DC=5, gpio_RST=6)
         device1 = ssd1322(serial1, mode="1", rotate=config['screenRotation'])
     font = makeFont("Dot Matrix Regular.ttf", 10)
     fontBold = makeFont("Dot Matrix Bold.ttf", 10)
@@ -409,37 +422,37 @@ try:
     # display NRE attribution while data loads
     virtual = drawStartup(device, width=widgetWidth, height=widgetHeight)
     virtual.refresh()
-    if config['dualScreen'] == True:
+    if config['dualScreen']:
         virtual = drawStartup(device1, width=widgetWidth, height=widgetHeight)
         virtual.refresh()
-    if config['emulator'] != True and config['headless'] != True:
+    if config['emulator'] is not True and config['headless'] is not True:
         time.sleep(5)
 
-    timeAtStart = time.time()-config["refreshTime"]
+    timeAtStart = time.time() - config["refreshTime"]
     timeNow = time.time()
     timeFPS = time.time()
-    
+
     blankHours = []
     if config['hoursPattern'].match(config['screenBlankHours']):
         blankHours = [int(x) for x in config['screenBlankHours'].split('-')]
 
     while True:
         with regulator:
-            if len(blankHours) == 2 and isRun(blankHours[0], blankHours[1]) == True:
+            if len(blankHours) == 2 and isRun(blankHours[0], blankHours[1]):
                 device.clear()
-                if config['dualScreen'] == True:
+                if config['dualScreen']:
                     device1.clear()
                 time.sleep(10)
             else:
-                if(timeNow - timeFPS >= config['fpsTime']):
+                if (timeNow - timeFPS >= config['fpsTime']):
                     timeFPS = time.time()
-                    print('Effective FPS: ' + str(round(regulator.effective_FPS(),2)))
-                if(timeNow - timeAtStart >= config["refreshTime"]):
+                    print('Effective FPS: ' + str(round(regulator.effective_FPS(), 2)))
+                if (timeNow - timeAtStart >= config["refreshTime"]):
                     data = loadData(config["api"], config["journey"], config)
-                    if data[0] == False:
+                    if data[0] is False:
                         virtual = drawBlankSignage(
                             device, width=widgetWidth, height=widgetHeight, departureStation=data[2])
-                        if config['dualScreen'] == True:
+                        if config['dualScreen']:
                             virtual1 = drawBlankSignage(
                                 device1, width=widgetWidth, height=widgetHeight, departureStation=data[2])
                     else:
@@ -447,17 +460,17 @@ try:
                         nextStations = data[1]
                         station = data[2]
                         screenData = platform_filter(departureData, config["journey"]["screen1Platform"], nextStations, station)
-                        virtual = drawSignage(device, width=widgetWidth,height=widgetHeight, data=screenData)
-                        
-                        if config['dualScreen'] == True:
+                        virtual = drawSignage(device, width=widgetWidth, height=widgetHeight, data=screenData)
+
+                        if config['dualScreen']:
                             screen1Data = platform_filter(departureData, config["journey"]["screen2Platform"], nextStations, station)
-                            virtual1 = drawSignage(device1, width=widgetWidth,height=widgetHeight, data=screen1Data)
+                            virtual1 = drawSignage(device1, width=widgetWidth, height=widgetHeight, data=screen1Data)
 
                     timeAtStart = time.time()
 
                 timeNow = time.time()
                 virtual.refresh()
-                if config['dualScreen'] == True:
+                if config['dualScreen']:
                     virtual1.refresh()
 
 except KeyboardInterrupt:
