@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 * New feature: XXX [James Harland]
 * Performance: Seconds now render every 0.1 second, rather than a hotspot (reduce CPU)
-* Performance: Station "calling at" display now rendered as a static bitmap and scrolled smoothly (reduce CPU)
+* Performance: All "in-loop" TTF font rendering is now cached (reduce CPU)
 * Development UX: Emulator mode via pygame
 * Development UX: Skip NRE attribution sleep in any dev mode (headless/emulator)
 * Development UX: Headless mode via serial noop
