@@ -7,7 +7,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v0.5.0
 ## (2023-06-29)
 
-* New feature: XXX [James Harland]
+* New feature: Support for 1st / 2nd / 3rd as per UK train departures. Config: `showDepartureNumbers`
+* New feature (WIP): Option to remove bold on first departure line. Departure boards round here don't have the first departure in bold.
 * Performance: Seconds now render every 0.1 second, rather than a hotspot (reduce CPU)
 * Performance: All "in-loop" TTF font rendering is now cached (reduce CPU)
 * Development UX: Emulator mode via pygame
