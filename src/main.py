@@ -387,8 +387,8 @@ try:
 
     if config['dualScreen'] == True:
         print('Dual screen enabled')
-        # serial1 = spi(port=1,gpio_DC=5, gpio_RST=6)
-        # device1 = ssd1322(serial1, mode="1", rotate=config['screenRotation'])
+        serial1 = spi(port=1,gpio_DC=5, gpio_RST=6)
+        device1 = ssd1322(serial1, mode="1", rotate=config['screenRotation'])
     font = makeFont("Dot Matrix Regular.ttf", 10)
     fontBold = makeFont("Dot Matrix Bold.ttf", 10)
     fontBoldTall = makeFont("Dot Matrix Bold Tall.ttf", 10)
