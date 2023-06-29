@@ -25,7 +25,7 @@ def loadConfig():
         data["firstDepartureBold"] = False
     data["hoursPattern"] = re.compile("^((2[0-3]|[0-1]?[0-9])-(2[0-3]|[0-1]?[0-9]))$")
 
-    data["journey"]["departureStation"] = os.getenv("departureStation") or "STP"
+    data["journey"]["departureStation"] = os.getenv("departureStation") or "PAD"
 
     data["journey"]["destinationStation"] = os.getenv("destinationStation") or ""
     if data["journey"]["destinationStation"] == "null" or data["journey"]["destinationStation"] == "undefined":
