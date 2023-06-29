@@ -8,7 +8,7 @@ def loadConfig():
     }
 
     data["refreshTime"] = int(os.getenv("refreshTime") or 180)
-    data["fpsTime"] = int(os.getenv("fpsTime") or 2)
+    data["fpsTime"] = int(os.getenv("fpsTime") or 180)
     data["screenRotation"] = int(os.getenv("screenRotation") or 2)
     data["screenBlankHours"] = os.getenv("screenBlankHours") or ""
     data["headless"] = False
