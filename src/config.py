@@ -20,6 +20,9 @@ def loadConfig():
     data["dualScreen"] = False
     if os.getenv("dualScreen") == "True":
         data["dualScreen"] = True
+    data["firstDepartureBold"] = True
+    if os.getenv("firstDepartureBold") == "False":
+        data["firstDepartureBold"] = False
     data["hoursPattern"] = re.compile("^((2[0-3]|[0-1]?[0-9])-(2[0-3]|[0-1]?[0-9]))$")
 
     data["journey"]["departureStation"] = os.getenv("departureStation") or "STP"

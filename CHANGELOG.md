@@ -7,13 +7,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v0.5.0
 ## (2023-06-29)
 
-* New feature: Support for 1st / 2nd / 3rd as per UK train departures. Config: `showDepartureNumbers`
-* New feature (WIP): Option to remove bold on first departure line. Departure boards round here don't have the first departure in bold.
+* New feature: `showDepartureNumbers` option - Adds 1st / 2nd / 3rd prefix as per UK train departures
+* New feature: `firstDepartureBold` option - toggle bold of first departure line as this is regional
 * Performance: Seconds now render every 0.1 second, rather than a hotspot (reduce CPU)
 * Performance: All "in-loop" TTF font rendering is now cached (reduce CPU)
-* Development UX: Emulator mode via pygame
+* Development UX: `emulator` option - Emulator mode via pygame
 * Development UX: Skip NRE attribution sleep in any dev mode (headless/emulator)
-* Development UX: Headless mode via serial noop
+* Development UX: `headless` option - Headless mode via serial noop
 * Fix: screen1Platform/screen2Platform being required incorrectly on the env
 
 # v0.4.0

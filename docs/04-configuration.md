@@ -27,6 +27,7 @@ These environment variables are specified using the [balenaCloud dashboard](http
 | `emulator` | `True` (outputs to pygame emulator rather than serial; useful for running on a development machine)
 | `headless` | `True` (outputs to noop serial device rather than serial port; useful for running on a development machine)
 | `showDepartureNumbers` | `True` (adds 1st / 2nd / 3rd as per UK train departures)
+| `firstDepartureBold` | `False` (makes the first departure use either the bold or normal font)
 
 If using two screens the following line needs to be added into /boot/config.txt which is achieved by using the 'Define DT overlays' option within the Device configuration screen on balenaCloud: `spi1-3cs`
 

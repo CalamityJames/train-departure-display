@@ -316,8 +316,12 @@ def drawSignage(device, width, height, data):
         noTrains = drawBlankSignage(device, width=width, height=height, departureStation=departureStation)
         return noTrains
 
+    firstFont = font
+    if config['firstDepartureBold'] == True:
+        firstFont = fontBold
+
     rowOneA = snapshot(
-        width - w - pw - 5, 10, renderDestination(departures[0], font, '1st'), interval=config["refreshTime"])
+        width - w - pw - 5, 10, renderDestination(departures[0], firstFont, '1st'), interval=config["refreshTime"])
     rowOneB = snapshot(w, 10, renderServiceStatus(
         departures[0]), interval=10)
     rowOneC = snapshot(pw, 10, renderPlatform(departures[0]), interval=config["refreshTime"])
