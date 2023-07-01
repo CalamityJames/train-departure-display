@@ -8,9 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## (2023-07-01)
 
 * Switch Python version and base OS: Python 3.11 on Alpine
-* Simplify Dockerfile, probably at the cost of a smaller deploy image, because I do not know how to work Balena
-* Looks like we have a 367MB result
-* Remove emulator; it's a huge overhead for the install image.
+* Simplify Dockerfile slightly in an attempt to be Balena-y
+* Remove emulator; too annoying to get building in Docker
 
 # v0.5.0
 ## (2023-06-29)
