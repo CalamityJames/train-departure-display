@@ -13,7 +13,6 @@ from open import isRun
 from luma.core.interface.serial import spi, noop
 from luma.core.render import canvas
 from luma.oled.device import ssd1322
-from luma.emulator.device import pygame
 from luma.core.virtual import viewport, snapshot
 from luma.core.sprite_system import framerate_regulator
 
@@ -392,16 +391,12 @@ try:
 
     print('Starting Train Departure Display v' + version_file.read())
     config = loadConfig()
-    if config['emulator']:
-        print('Emulating using pygame; frames will be locked to 60fps')
-        device = pygame(256, 64)
+    if config['headless']:
+        print('Headless mode, running main loop without serial comms')
+        serial = noop()
     else:
-        if config['headless']:
-            print('Headless mode, running main loop without serial comms')
-            serial = noop()
-        else:
-            serial = spi(port=0)
-        device = ssd1322(serial, mode="1", rotate=config['screenRotation'])
+        serial = spi(port=0)
+    device = ssd1322(serial, mode="1", rotate=config['screenRotation'])
 
     if config['dualScreen']:
         serial1 = spi(port=1, gpio_DC=5, gpio_RST=6)
