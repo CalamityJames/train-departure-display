@@ -421,7 +421,7 @@ try:
     if config['dualScreen']:
         virtual = drawStartup(device1, width=widgetWidth, height=widgetHeight)
         virtual.refresh()
-    if config['emulator'] is not True and config['headless'] is not True:
+    if config['headless'] is not True:
         time.sleep(5)
 
     timeAtStart = time.time() - config["refreshTime"]
