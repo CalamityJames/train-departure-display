@@ -131,6 +131,10 @@ def ProcessDepartures(journeyConfig, APIOut):
         if 'lt4:operator' in eachService:
             thisDeparture["operator"] = eachService["lt4:operator"]
 
+        # get serviceID, for future use
+        if 'lt4:serviceID' in eachService:
+            thisDeparture["service_id"] = eachService["lt4:serviceID"]
+
         # get name of destination
         if not isinstance(eachService['lt5:destination']['lt4:location'], list):    # the service only has one destination
             thisDeparture["destination_name"] = removeBrackets(eachService['lt5:destination']['lt4:location']['lt4:locationName'])

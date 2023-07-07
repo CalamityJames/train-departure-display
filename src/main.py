@@ -2,7 +2,7 @@ import os
 import time
 
 import requests
-
+import sys
 from datetime import datetime
 from PIL import ImageFont, Image, ImageDraw
 
@@ -15,7 +15,7 @@ from luma.core.render import canvas
 from luma.oled.device import ssd1322
 from luma.core.virtual import viewport, snapshot
 from luma.core.sprite_system import framerate_regulator
-
+# from luma.emulator.device import pygame
 
 def makeFont(name, size):
     font_path = os.path.abspath(
@@ -42,15 +42,27 @@ def renderDestination(departure, font, pos):
 
     return drawText
 
+fillColor = {}
 
 def renderServiceStatus(departure):
     def drawText(draw, width, *_):
+        global fillColor
         train = ""
+
+        if departure["service_id"] not in fillColor:
+            fillColor[departure["service_id"]] = "black"
+            
+        if fillColor[departure["service_id"]]  == "yellow":
+            fillColor[departure["service_id"]]  = "black"
+        else:
+            fillColor[departure["service_id"]]  = "yellow"
 
         if departure["expected_departure_time"] == "On time":
             train = "On time"
+            fillColor[departure["service_id"]]  = "yellow"
         elif departure["expected_departure_time"] == "Cancelled":
             train = "Cancelled"
+
         elif departure["expected_departure_time"] == "Delayed":
             train = "Delayed"
         else:
@@ -61,7 +73,8 @@ def renderServiceStatus(departure):
                 train = "On time"
 
         w, _, bitmap = cachedBitmapText(train, font)
-        draw.bitmap((width - w, 0), bitmap, fill="yellow")
+        draw.bitmap((width - w, 0), bitmap, fill=fillColor[departure["service_id"]])
+        # test to make them flash
     return drawText
 
 
@@ -336,7 +349,7 @@ def drawSignage(device, width, height, data):
     rowOneA = snapshot(
         width - w - pw - 5, 10, renderDestination(departures[0], firstFont, '1st'), interval=config["refreshTime"])
     rowOneB = snapshot(w, 10, renderServiceStatus(
-        departures[0]), interval=10)
+        departures[0]), interval=0.5)
     rowOneC = snapshot(pw, 10, renderPlatform(departures[0]), interval=config["refreshTime"])
     rowTwoA = snapshot(callingWidth, 10, renderCallingAt, interval=config["refreshTime"])
     rowTwoB = snapshot(width - callingWidth, 10,
@@ -346,14 +359,14 @@ def drawSignage(device, width, height, data):
         rowThreeA = snapshot(width - w - pw, 10, renderDestination(
             departures[1], font, '2nd'), interval=config["refreshTime"])
         rowThreeB = snapshot(w, 10, renderServiceStatus(
-            departures[1]), interval=config["refreshTime"])
+            departures[1]), interval=0.5)
         rowThreeC = snapshot(pw, 10, renderPlatform(departures[1]), interval=config["refreshTime"])
 
     if len(departures) > 2:
         rowFourA = snapshot(width - w - pw, 10, renderDestination(
             departures[2], font, '3rd'), interval=10)
         rowFourB = snapshot(w, 10, renderServiceStatus(
-            departures[2]), interval=10)
+            departures[2]), interval=0.5)
         rowFourC = snapshot(pw, 10, renderPlatform(departures[2]), interval=config["refreshTime"])
 
     rowTime = snapshot(width, 14, renderTime, interval=0.1)
@@ -397,6 +410,10 @@ try:
     else:
         serial = spi(port=0)
     device = ssd1322(serial, mode="1", rotate=config['screenRotation'])
+
+    if config['headless']:
+        print('Emulating using pygame; frames will be locked to 60fps')
+        device = pygame(256, 64)
 
     if config['dualScreen']:
         serial1 = spi(port=1, gpio_DC=5, gpio_RST=6)
