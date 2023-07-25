@@ -131,6 +131,12 @@ def ProcessDepartures(journeyConfig, APIOut):
         if 'lt4:operator' in eachService:
             thisDeparture["operator"] = eachService["lt4:operator"]
 
+        # get cancellation reason, if available. takes priority over delay
+        if 'lt4:cancelReason' in eachService:
+            thisDeparture["disruption_reason"] = eachService["lt4:cancelReason"]
+        elif 'lt4:delayReason' in eachService:
+            thisDeparture["disruption_reason"] = eachService["lt4:delayReason"]
+
         # get name of destination
         if not isinstance(eachService['lt5:destination']['lt4:location'], list):    # the service only has one destination
             thisDeparture["destination_name"] = removeBrackets(eachService['lt5:destination']['lt4:location']['lt4:locationName'])
@@ -193,6 +199,10 @@ def ProcessDepartures(journeyConfig, APIOut):
                 prepareServiceMessage(thisDeparture["operator"]),
                 prepareCarriagesMessage(thisDeparture["carriages"])
             )
+        # check for disruption
+        if ("disruption_reason" in thisDeparture):
+            print(thisDeparture["disruption_reason"])
+            thisDeparture["calling_at_list"] += " -- " + thisDeparture["disruption_reason"]
         # print("the " + thisDeparture["aimed_departure_time"] + " calls at " + thisDeparture["calling_at_list"])
 
         Departures[servicenum] = thisDeparture
