@@ -87,6 +87,7 @@ def ProcessDepartures(journeyConfig, APIOut):
             return None, None
         else:
             # use the last known good data
+            print("Using last known good copy of API data...")
             APIElements = APIElementsCopy
     Services = []
 
