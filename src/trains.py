@@ -2,6 +2,7 @@ import requests
 import re
 import xmltodict
 
+APIElementsCopy = None
 
 def removeBrackets(originalName):
     return re.split(r" \(", originalName)[0]
@@ -72,16 +73,25 @@ def ArrivalOrder(ServicesIN):
 
 
 def ProcessDepartures(journeyConfig, APIOut):
+    global APIElementsCopy
     show_individual_departure_time = journeyConfig["individualStationDepartureTime"]
     try:
         APIElements = xmltodict.parse(APIOut)
     except xmltodict.expat.ExpatError as err:
-        Services = None
         # Log the error, as it doesn't happen often, but return None None to display error
         print('Error: Failed to parse data from OpenLDBWS')
         print(str(err))
-        return None, None
+        # check if we have any good data
+        if APIElementsCopy is None:
+            Services = None
+            return None, None
+        else:
+            # use the last known good data
+            APIElements = APIElementsCopy
     Services = []
+
+    # we have a working copy of the data, so let's save it for reuse in case there's an issue reading the data later
+    APIElementsCopy = APIElements
 
     # get departure station name
     departureStationName = APIElements['soap:Envelope']['soap:Body']['GetDepBoardWithDetailsResponse']['GetStationBoardResult']['lt4:locationName']
