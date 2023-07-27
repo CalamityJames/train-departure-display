@@ -73,7 +73,14 @@ def ArrivalOrder(ServicesIN):
 
 def ProcessDepartures(journeyConfig, APIOut):
     show_individual_departure_time = journeyConfig["individualStationDepartureTime"]
-    APIElements = xmltodict.parse(APIOut)
+    try:
+        APIElements = xmltodict.parse(APIOut)
+    except xmltodict.expat.ExpatError as err:
+        Services = None
+        # Log the error, as it doesn't happen often, but return None None to display error
+        print('Error: Failed to parse data from OpenLDBWS')
+        print(str(err))
+        return None, None
     Services = []
 
     # get departure station name

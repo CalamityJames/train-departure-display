@@ -15,7 +15,6 @@ from luma.core.render import canvas
 from luma.oled.device import ssd1322
 from luma.core.virtual import viewport, snapshot
 from luma.core.sprite_system import framerate_regulator
-
 import socket, re, uuid
 
 def makeFont(name, size):
@@ -183,9 +182,8 @@ def renderDebugScreen(lines):
 
     return drawDebug
 
-def renderWelcomeTo(xOffset):
+def renderBlankRowOne(xOffset, text):
     def drawText(draw, *_):
-        text = "Welcome to"
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return drawText
@@ -215,9 +213,8 @@ def renderName(xOffset):
     return drawText
 
 
-def renderDepartureStation(departureStation, xOffset):
+def renderBlankRowTwo(xOffset, text):
     def draw(draw, *_):
-        text = departureStation
         draw.text((int(xOffset), 0), text=text, font=fontBold, fill="yellow")
 
     return draw
@@ -333,17 +330,29 @@ def drawDebugScreen(device, width, height, screen="1", showTime=False):
 def drawBlankSignage(device, width, height, departureStation):
     global stationRenderCount, pauseCount
 
-    welcomeSize = int(fontBold.getlength("Welcome to"))
-    stationSize = int(fontBold.getlength(departureStation))
+    if departureStation is None:
+        if config["debug"] is not False:
+            # show error if debug is enabled
+            rowOneText = "Error fetching data from OpenLDBWS"
+            rowTwoText = "Will retry on next refresh (" + str(config["refreshTime"]) + "s)"
+        else:
+            # revert to out of hours text
+            rowOneText = "Welcome to"
+            rowTwoText = config["journey"]["outOfHoursName"]
+    else:
+        rowOneText = "Welcome to"
+        rowTwoText = departureStation
+    rowOneSize = int(fontBold.getlength(rowOneText))
+    rowTwoSize = int(fontBold.getlength(rowTwoText))
 
     device.clear()
 
     virtualViewport = viewport(device, width=width, height=height)
 
-    rowOne = snapshot(width, 10, renderWelcomeTo(
-        (width - welcomeSize) / 2), interval=config["refreshTime"])
-    rowTwo = snapshot(width, 10, renderDepartureStation(
-        departureStation, (width - stationSize) / 2), interval=config["refreshTime"])
+    rowOne = snapshot(width, 10, renderBlankRowOne(
+        (width - rowOneSize) / 2, text=rowOneText), interval=config["refreshTime"])
+    rowTwo = snapshot(width, 10, renderBlankRowTwo(
+        (width - rowTwoSize) / 2, text=rowTwoText), interval=config["refreshTime"])
     rowThree = snapshot(width, 10, renderDots, interval=config["refreshTime"])
     # this will skip a second sometimes if set to 1, but a hotspot burns CPU
     # so set to snapshot of 0.1; you won't notice
@@ -543,7 +552,6 @@ try:
                 if timeNow - timeAtStart >= config["refreshTime"]:
                     # check if debug mode is enabled 
                     if config["debug"] == True:
-                        print(config["debug"])
                         virtual = drawDebugScreen(device, width=widgetWidth, height=widgetHeight, showTime=True)
                         if config['dualScreen']:
                             virtual1 = drawDebugScreen(device1, width=widgetWidth, height=widgetHeight, showTime=True, screen="2")
