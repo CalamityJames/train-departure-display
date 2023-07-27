@@ -330,17 +330,17 @@ def drawDebugScreen(device, width, height, screen="1", showTime=False):
 def drawBlankSignage(device, width, height, departureStation):
     global stationRenderCount, pauseCount
 
+    # set default welcome to message for row 1
+    rowOneText = "Welcome to"
+
     if departureStation is None:
         if config["debug"] is not False:
             # show error if debug is enabled
             rowOneText = "Error fetching data from OpenLDBWS"
             rowTwoText = "Will retry on next refresh (" + str(config["refreshTime"]) + "s)"
         else:
-            # revert to out of hours text
-            rowOneText = "Welcome to"
             rowTwoText = config["journey"]["outOfHoursName"]
     else:
-        rowOneText = "Welcome to"
         rowTwoText = departureStation
     rowOneSize = int(fontBold.getlength(rowOneText))
     rowTwoSize = int(fontBold.getlength(rowTwoText))
